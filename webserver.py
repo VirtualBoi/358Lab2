@@ -14,8 +14,6 @@ serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 serverSocket.bind((serverIP, serverPort))
 serverSocket.listen(1)
 
-print ("The server is ready to receive")
-
 #list all files that are in directory
 files = []
 for (dir_path, dir_names, file_names) in os.walk(os.getcwd()):
@@ -27,16 +25,23 @@ not_found = "<html>\r\n<body>\r\n<center>\r\n<h3>Error 404: File not found</h3>\
 response = ""
 
 # header min 6 lines
-connection = "Connection: keep-alive"
+connection = "Connection: close"
 date = ""
-server = "Server: J@E: " + serverIP
+server = "Server: J.Ko & E.Gilbert " + serverIP
 timestamp_mod = ""
 content_len = ""
 content_type = ""
 
 def main():
+    
     #algorithm
     while True:
+        #Update Header variables
+        date = ""
+        timestamp_mod = ""
+        content_len = ""
+        content_type = ""
+        
         #recieve from Client
         connectionSocket, addr = serverSocket.accept()
         request = connectionSocket.recv(2048).decode()
@@ -49,6 +54,8 @@ def main():
         file_reg = re.search("\s+([^\s]+)", request)
         request_type = request_type_reg.group()
         file_name = file_reg.group()[2:]
+
+        #default header variables
         html_text = ""
         response = "HTTP/1.1 400 Bad Request \r\n" #default respond with 404 not found
         header = ""
@@ -81,18 +88,13 @@ def main():
 
         else:
             response = "HTTP/1.1 404 Not Found \r\n"
+            header = connection + "\n" + date + "\n" + server + "\n" + timestamp_mod + "\n" + content_len + "\n" + content_type + "\n"
             html_text = not_found   
             final_response = response+header+'\n'+html_text
 
 
         #Send full HTTP response
         connectionSocket.sendall((final_response).encode())
-
-        #Update Header variables
-        date = ""
-        timestamp_mod = ""
-        content_len = ""
-        content_type = ""
 
         connectionSocket.close()
  
