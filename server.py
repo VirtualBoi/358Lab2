@@ -1,5 +1,6 @@
 
 from socket import *
+import random
 
 domain = ""
 domainType = ""
@@ -7,6 +8,20 @@ domainClass = ""
 TTL = 0
 IP_address = 0
 record = 0
+
+# response information
+# DNS header
+ID = ""
+FLAGS = ""
+QDCOUNT = ""
+ANCOUNT = ""
+NSCOUNT = ""
+ARCOUNT = ""
+
+# query
+QNAME = ""
+QTYPE = ""
+QCLASS = ""
 
 
 def domain_data(domain_name):
@@ -55,7 +70,8 @@ print ("The server is ready to receive")
 
 while True:
     message, clientAddress = serverSocket.recvfrom(2048)
-    print(message)
+    print("\033[4mRequest:\033[0m")
+    # print(message + "\n")
     if domain_data(message):
         modifiedMessage = "Unknown domain name"
     elif message == "google.com":
@@ -63,8 +79,7 @@ while True:
                            .format(domain, domainType, domainClass, TTL, record, IP_address[0], domain, domainType, domainClass, TTL, record, IP_address[1]))
     else:
         modifiedMessage = ("{}: type {}, class {}, TTL {}, addr ({}) {}".format(domain, domainType, domainClass, TTL, record, IP_address))
-    # modifiedMessage = message.decode().upper()
-    # print(modifiedMessage)
-    # print(clientAddress)
+    print("\033[4mResponse:\033[0m")
+    # print(modifiedMessage + "\n")
     serverSocket.sendto(modifiedMessage.encode(), clientAddress)
 
