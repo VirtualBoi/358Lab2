@@ -65,8 +65,9 @@ def main():
         html_text = ""
         response = "HTTP/1.1 400 Bad Request \r\n" #default respond with 404 not found
         header = ""
-
         path = ""
+
+        final_response = ""
 
         #search for requested file
         if (file_name in files):
