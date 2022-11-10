@@ -8,8 +8,8 @@ serverPort = 12000
 
 def split_hex(in_hex):
     split_input = (hex(int(in_hex, 2)).lstrip("0x"))
-    half1 = split_input[:len(split_input) / 2].zfill(2)
-    half2 = split_input[len(split_input) / 2:].zfill(2)
+    half1 = split_input[:len(split_input) // 2].zfill(2)
+    half2 = split_input[len(split_input) // 2:].zfill(2)
     return half1 + " " + half2
 
 
@@ -40,8 +40,9 @@ QCLASS = "00 01"  # Set QCLASS field as IN (00 01) (hex value) for the Internet.
 def main():
     while True:
         clientSocket = socket(AF_INET, SOCK_DGRAM)
+        clientSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         print("\033[4mInput from the user:\033[0m")
-        message = raw_input("Enter Domain Name: ")
+        message = input("Enter Domain Name: ")
         QNAME = ""
 
         print("\n\033[4mOutput:\033[0m")
@@ -55,20 +56,20 @@ def main():
 
         DNS_header = hex_ID + " " + hex_FLAGS + " " + QDCOUNT + " " + ANCOUNT + " " + NSCOUNT + " " + ARCOUNT
         query = QNAME + QTYPE + " " + QCLASS
-        # print(DNS_header)
-        # print(QNAME)
         message = DNS_header + " " + query
-
         clientSocket.sendto(message.encode(), (serverIP, serverPort))
+
         outputMessage, serverAddress = clientSocket.recvfrom(2048)
-        header_response = outputMessage[0:35].replace(" ", "")
+        outputMessage = outputMessage.decode()
+        
+        header_response = outputMessage[0:35]
         query_response = outputMessage[36:].replace(" ", "")
         if len(query_response) % 2 != 0:
             query_response = query_response.zfill(len(query_response)+1)
         print(query_response)
-        print(query_response.decode("hex"))
+        # print(query_response.decode("hex"))
 
-        print(outputMessage.decode() + "\n")
+        print(outputMessage + "\n")
         clientSocket.close()
 
 
