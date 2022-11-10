@@ -3,58 +3,55 @@ from socket import *
 import random
 
 domain = ""
-domainType = ""
-domainClass = ""
 TTL = 0
 IP_address = 0
 record = 0
 
 # response information
 # DNS header
-ID = ""
+ID = random.randint(0, 65535)
+QR = ""  # query = 0, response = 1
+OPCODE, TC, RD, RA, RCODE, NSCOUNT, ARCOUNT = 0, 0, 0, 0, 0, 0, 0
+AA, QDCOUNT = 1, 1
+Z = "000"
 FLAGS = ""
-QDCOUNT = ""
-ANCOUNT = ""
-NSCOUNT = ""
-ARCOUNT = ""
+ANCOUNT = ""  # an unsigned 16-bit integer specifying the number of resource records in the answer section.
+
 
 # query
 QNAME = ""
-QTYPE = ""
-QCLASS = ""
+QTYPE = "A"
+QCLASS = "IN"  # Set QCLASS field as IN (00 01) (hex value) for the Internet.
+
+# answer
+NAME = "c0 0c"
+TYPE = "41"  # type A in hex
+CLASS = "49 4e"  # only deal with IN class
+# TTL = 0
+RDLENGTH = ""  # an unsigned 16 bit integer that specifies the length in octets of the RDATA field
+RDATA = ""  # a variable length string of octets that describes the resource. The format of this information
+            # varies according to the TYPE and CLASS of the resource record
 
 
 def domain_data(domain_name):
-    global domainType
-    global domainClass
     global TTL
     global IP_address
     global domain
 
     domain = domain_name
     if domain == "google.com":
-        domainType = "IN"
-        domainClass = 'A'
         TTL = 260
         IP_address = ("192.165.1.1", "192.165.1.10")
     elif domain == "youtube.com":
-        domainType = "IN"
-        domainClass = 'A'
         TTL = 160
         IP_address = "192.165.1.2"
     elif domain == "uwaterloo.ca":
-        domainType = "IN"
-        domainClass = 'A'
         TTL = 160
         IP_address = "192.165.1.3"
     elif domain == "wikipedia.org":
-        domainType = "IN"
-        domainClass = 'A'
         TTL = 160
         IP_address = "192.165.1.4"
     elif domain == "amazon.ca":
-        domainType = "IN"
-        domainClass = 'A'
         TTL = 160
         IP_address = "192.165.1.5"
     else:
@@ -76,9 +73,9 @@ while True:
         modifiedMessage = "Unknown domain name"
     elif message == "google.com":
         modifiedMessage = ("{}: type {}, class {}, TTL {}, addr ({}) {}\n{}: type {}, class {}, TTL {}, addr ({}) {}"
-                           .format(domain, domainType, domainClass, TTL, record, IP_address[0], domain, domainType, domainClass, TTL, record, IP_address[1]))
+                           .format(domain, QTYPE, QCLASS, TTL, record, IP_address[0], domain, QTYPE, QCLASS, TTL, record, IP_address[1]))
     else:
-        modifiedMessage = ("{}: type {}, class {}, TTL {}, addr ({}) {}".format(domain, domainType, domainClass, TTL, record, IP_address))
+        modifiedMessage = ("{}: type {}, class {}, TTL {}, addr ({}) {}".format(domain, QTYPE, QCLASS, TTL, record, IP_address))
     print("\033[4mResponse:\033[0m")
     # print(modifiedMessage + "\n")
     serverSocket.sendto(modifiedMessage.encode(), clientAddress)
