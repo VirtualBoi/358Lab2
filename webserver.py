@@ -6,19 +6,12 @@ import datetime
 import time
 import os
 
-path = "HelloWorld.html"
 serverIP = "127.0.0.1"
 serverPort = 10000
 serverSocket = socket(AF_INET,SOCK_STREAM)
 serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 serverSocket.bind((serverIP, serverPort))
 serverSocket.listen(1)
-
-#list all files that are in directory
-files = []
-for (dir_path, dir_names, file_names) in os.walk(os.getcwd()):
-    files.extend(file_names)
-#if ("HelloWorld.html" in files):
 
 #404 not found html
 not_found = "<html>\r\n<body>\r\n<center>\r\n<h3>Error 404: File not found</h3>\r\n</center>\r\n</body>\r\n</html>"
@@ -41,6 +34,9 @@ def main():
         timestamp_mod = ""
         content_len = ""
         content_type = ""
+
+        #Reset working dir
+        os.chdir(os.path.dirname(os.path.realpath(__file__)))
         
         #recieve from Client
         connectionSocket, addr = serverSocket.accept()
@@ -55,14 +51,26 @@ def main():
         request_type = request_type_reg.group()
         file_name = file_reg.group()[2:]
 
+        #list all files that are in directory
+        files = []
+        path = os.getcwd()
+        for (dir_path, dir_names, file_names) in os.walk(os.getcwd()):
+            files.extend(file_names)
+            if (file_name in file_names):
+                path = dir_path
+
+        os.chdir(path) #change working dir to desired file path
+
         #default header variables
         html_text = ""
         response = "HTTP/1.1 400 Bad Request \r\n" #default respond with 404 not found
         header = ""
 
+        path = ""
+
         #search for requested file
         if (file_name in files):
-            html_text = open(file_name, "r").read()
+            html_text = open(file_name, 'r').read()
 
             #update header variables
             ti_m = os.path.getmtime(file_name)
