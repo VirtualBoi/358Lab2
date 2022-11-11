@@ -106,6 +106,7 @@ def main():
         connectionSocket.sendall((final_response).encode())
 
         connectionSocket.close()
- 
+
+
 if __name__ == "__main__":
     main()
