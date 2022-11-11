@@ -51,8 +51,6 @@ def main():
         message = input("Enter Domain Name: ")
         QNAME = ""
 
-        print("\n\033[4mOutput:\033[0m")
-
         # end session
         if message == "end":
             print("Session ended")
@@ -81,14 +79,19 @@ def main():
         outputMessage, serverAddress = clientSocket.recvfrom(2048)
         outputMessage = outputMessage.decode()
 
+        print("\n\033[4mOutput:\033[0m")
+
         # if unknown domain
         if outputMessage == "55 6E 6B 6E 6F 77 6E 20 64 6F 6D 61 69 6E 20 6E 61 6D 65":
             print("Unknown domain name")
         else:
             id_bytes = ["", "", "", ""]
+
+            # splitting response into known sections of query and domain
             query_response = outputMessage[36:len(query) + 36]
             domain_response = bytes.fromhex(query_response[0:-12]).decode('utf-8')
 
+            # searches response for c0 0c identifier
             num_of_ids = len(re.findall("c0 0c", outputMessage))
             res = re.search("(c0 0c)", outputMessage)
 
@@ -96,6 +99,7 @@ def main():
             for i in range(num_of_ids):
                 index = res.end() + 1 + i*42
 
+                # confirms correct type and class
                 if outputMessage[index:index + 5] == "00 01":
                     type_response = "A"
                 else:
@@ -104,6 +108,8 @@ def main():
                     class_response = "IN"
                 else:
                     class_response = "N/A"
+
+                # reads in TTL and RDLENGTH
                 TTL_response = int(((outputMessage[index + 12: index + 17]).replace(" ", "")), 16)
                 len_response = int(((outputMessage[index + 18: index + 23]).replace(" ", "")), 16)
 
@@ -114,6 +120,8 @@ def main():
                 output(domain_response, type_response, class_response, TTL_response, len_response, address_response)
 
         print("")
+
+        # closing socket
         clientSocket.close()
 
 

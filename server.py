@@ -15,7 +15,7 @@ RDATA = ""
 RDATA2 = ""
 
 
-# updating the flags for a response instead of a query
+# updating the flags for a response instead of a query (swapping first bit and changing back to hex)
 def update_flags(in_flags):
     hex_temp = in_flags.replace(" ", "")
     bin_temp = list((bin(int(hex_temp, 16)).replace("b", "")).zfill(16))
@@ -89,9 +89,10 @@ def main():
 
         print("\033[4mResponse:\033[0m")
         answer2 = ""
+
+        # if unknown domain send that as response
         if domain_data(domain):
             modifiedMessage = "55 6E 6B 6E 6F 77 6E 20 64 6F 6D 61 69 6E 20 6E 61 6D 65"  # "Unknown domain name" in hex
-
         else:
             # breaking message into header and question components
             hex_ID = message[0:5]
@@ -118,7 +119,7 @@ def main():
             print(modifiedMessage[35:len(query) + 25] + "\033[36m" + modifiedMessage[len(query) + 25:len(query) + 30] +
                 "\033[30m" + modifiedMessage[len(query) + 30:len(query) + 36], end='')
 
-            # prints colour coded response
+            # prints colour coded response (adds extra answer for domains with multiple IPs)
             print(" \033[36m" + NAME + "\033[33m " + TYPE + "\033[35m " + CLASS + "\033[31m " + TTL + "\033[34m " + RDLENGTH
                 + "\033[32m " + RDATA + "\033[0m", end='')
             if answer2 != "":
