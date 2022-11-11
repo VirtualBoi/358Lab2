@@ -78,9 +78,10 @@ def main():
         print("\033[4mRequest:\033[0m")
         print("\033[36m" + message[0:5] + "\033[30m" + message[5:11] + "\033[33m" + message[11:17] + "\033[31m" +
               message[17:23] + "\033[32m" + message[23:29] + "\033[34m" + message[29:35], end='')
-        print("\033[35m" + message[35:len(query) + 25] + "\033[36m" + message[-11:-5] + "\033[30m" + message[-5:] + "\n")
+        print("\033[35m" + message[35:len(query) + 25] + "\033[36m" + message[-11:-5] + "\033[30m" + message[-5:] + "\033[0m\n")
 
         print("\033[4mResponse:\033[0m")
+        answer2 = ""
         if domain_data(domain):
             modifiedMessage = "55 6E 6B 6E 6F 77 6E 20 64 6F 6D 61 69 6E 20 6E 61 6D 65"  # "Unknown domain name" in hex
         else:
@@ -97,8 +98,6 @@ def main():
             answer = NAME + " " + TYPE + " " + CLASS + " " + TTL + " " + RDLENGTH + " " + RDATA
             if domain == "67 6f 6f 67 6c 65 2e 63 6f 6d":
                 answer2 = NAME + " " + TYPE + " " + CLASS + " " + TTL + " " + RDLENGTH + " " + RDATA2
-            else:
-                answer2 = ""
             modifiedMessage = DNS_header + " " + query + " " + answer + " " + answer2
 
         print("\033[36m" + modifiedMessage[0:5] + "\033[30m" + modifiedMessage[5:11] + "\033[33m" +
@@ -106,8 +105,13 @@ def main():
               "\033[34m" + modifiedMessage[29:35] + "\033[35m", end='')
         print(modifiedMessage[35:len(query) + 25] + "\033[36m" + modifiedMessage[len(query) + 25:len(query) + 30] +
               "\033[30m" + modifiedMessage[len(query) + 30:len(query) + 36], end='')
-        print(modifiedMessage[len(query) + 36:])
-        print(modifiedMessage + "\n")
+        print(" \033[36m" + NAME + "\033[33m " + TYPE + "\033[35m " + CLASS + "\033[31m " + TTL + "\033[34m " + RDLENGTH
+              + "\033[32m " + RDATA + "\033[0m", end='')
+        if answer2 != "":
+            print(" \033[36m" + NAME + "\033[33m " + TYPE + "\033[35m " + CLASS + "\033[31m " + TTL + "\033[34m " +
+                  RDLENGTH + "\033[32m " + RDATA2 + "\033[0m", end='')
+
+        print("\n")
         serverSocket.sendto(modifiedMessage.encode(), clientAddress)
 
 
